@@ -1,0 +1,25 @@
+{
+    "name": "forge"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+    "amqp": "0.1.x"
+    , "commander": "1.1.x"
+    , "underscore": "1.4.x"
+    , "underscore.string": "2.3.0"
+    , "postal": "0.7.x"
+    , "step": "0.0.x"
+    , "forever": "0.10.x"
+  }
+  , "devDependencies": {
+    "mocha": "1.7.x"
+    , "sinon": "1.5.x"
+    , "should": "1.2.x"
+  }
+  , "scripts": {
+    "test": "mocha"
+  }
+  , "engine": "node >= 0.8.1"
+  , "bin": { "forge" : "./forge.js" }
+  , "main": "./forge"
+}

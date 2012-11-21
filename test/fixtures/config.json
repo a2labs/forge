@@ -1,0 +1,5 @@
+{
+    "include": ["somefile.js", "somefile2.js"],
+    "daemon": false,
+    "update_script": "somefile.js",
+}
