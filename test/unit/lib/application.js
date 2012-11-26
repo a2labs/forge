@@ -2,6 +2,7 @@ var assert = require( "should" ),
     postal = require( "postal" ),
     sinon = require( "sinon" ),
     path = require( "path" ),
+    cp = require( "child_process" ),
     root_dir = path.resolve( __dirname + "../../../../" ),
     lib_dir = root_dir + "/lib",
     test_dir = root_dir + "/test",
@@ -167,6 +168,48 @@ describe( 'Application', function() {
                 done();
             }, 1000 );
         });
+    });
+
+    describe( 'update', function() {
+
+        it( 'should pull the latest content from a git repository, run an update script, and restart the app', function() {
+            var exec_args,
+                exec_args2,
+                git_cb,
+                update_cb;
+
+            postal.channel = sinon.stub( postal, 'channel' ).returns( postal );
+            postal.publish = sinon.stub( postal, 'publish' );
+            cp.exec = sinon.stub( cp, 'exec' );
+            app.restart = sinon.stub( app, 'restart' );
+
+            app.update();
+
+            cp.exec.called.should.be.true;
+            exec_args = cp.exec.args[0];
+
+            exec_args[0].should.equal( "testgit reset --hard master && git pull origin master" );
+            exec_args[1].should.eql( { cwd: app.directory } );
+            git_cb = exec_args[2];
+
+            git_cb( '', 'someoutput' );
+            // Can test for postal messages if we want to.
+             
+            exec_args2 = cp.exec.getCall(1).args;
+            exec_args2[0].should.equal( "./update.js" );
+            exec_args2[1].should.eql( { cwd: app.directory } );
+            update_cb = exec_args2[2];
+
+            update_cb();
+
+            app.restart.called.should.be.true;
+
+            postal.channel.restore();
+            postal.publish.restore();
+            cp.exec.restore();
+            app.restart.restore();
+        } );
+
     });
 
 });

@@ -5,5 +5,8 @@
     },
     "update_on_start": false,
     "daemon": true,
-    "sometestkey": "sometestval"
+    "sometestkey": "sometestval",
+    "scripts": {
+        "update": "./update.js"
+    }
 }
