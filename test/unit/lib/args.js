@@ -1,11 +1,15 @@
-require( "should" );
+var should = require( "should" ),
+    path = require( "path" ),
+    root_dir = path.resolve( __dirname + "../../../../" ),
+    lib_dir = root_dir + "/lib",
+    test_dir = root_dir + "/test";
 
 describe( 'args', function() {
 
     var args;
 
     before( function( done ) {
-        args = require( "../../../lib/args.js" );
+        args = require( lib_dir + "/args.js" );
         done();
     });
 

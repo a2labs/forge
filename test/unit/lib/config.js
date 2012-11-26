@@ -1,18 +1,21 @@
-var should = require( "should" );
+var should = require( "should" ),
+    path = require( "path" ),
+    root_dir = path.resolve( __dirname + "../../../../" ),
+    lib_dir = root_dir + "/lib";
 
 describe( 'config', function() {
 
     var config;
 
     before( function( done ) {
-        config = require( "../../../lib/config.js" );
+        config = require( lib_dir + "/config.js" );
         done();
     });
 
     describe( 'init()', function() {
 
         it( 'should read variables from a configuration file', function() {
-            var parsed = config.init( "../../fixtures/config.json" );
+            var parsed = config.init( root_dir + "/test/fixtures/config.json" );
             parsed.include.should.eql( ['somefile.js', 'somefile2.js']);
             parsed.daemon.should.equal( false );
         } );
@@ -34,7 +37,7 @@ describe( 'config', function() {
         } );
 
         it( 'should merge an options object into configuration', function() {
-            var parsed = config.init( "../../fixtures/config.json" );
+            var parsed = config.init( root_dir + "/test/fixtures/config.json" );
             
             parsed.daemon.should.equal( 'true' );
         } );

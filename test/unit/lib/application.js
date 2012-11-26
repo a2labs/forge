@@ -1,18 +1,22 @@
 var assert = require( "should" ),
     postal = require( "postal" ),
     sinon = require( "sinon" ),
-    cfg = require( "../../../lib/config.js"),
-    factory = require( "../../../lib/application.js" );
+    path = require( "path" ),
+    root_dir = path.resolve( __dirname + "../../../../" ),
+    lib_dir = root_dir + "/lib",
+    test_dir = root_dir + "/test",
+    cfg = require( lib_dir + "/config.js"),
+    factory = require( lib_dir + "/application.js" );
 
 describe( 'Application', function() {
 
     var app,
-        config = cfg.init(),
+        config = cfg.init( root_dir + "/config.json" ),
         args = {
             app_args: ["arg1", "arg2"]
         },
         options = {
-            cwd: "../../fixtures/app1"
+            cwd: test_dir + "/fixtures/app1"
         },
         createApp = function(type) {
             type = type || 'long';
@@ -23,11 +27,14 @@ describe( 'Application', function() {
             return factory.create( args, config, options );
         };
 
+    process.on('exit', function() {
+        if ( app ) {
+            app.stop();
+        }
+    });
+
     beforeEach( function( done ) {
         app = createApp( 'long' );
-        process.on('exit', function() {
-            app.stop();
-        });
         done();
     });
 
@@ -47,10 +54,15 @@ describe( 'Application', function() {
             app.options.should.eql( options );
             app.args.should.eql( args );
 
-            app.executable.should.equal( "../../fixtures/app1/long_process.js" );
-            app.directory.should.equal( "../../fixtures/app1" );
-            app.process_args.should.eql(["../../fixtures/app1/long_process.js", "arg1", "arg2"]);
+            app.executable.should.equal( test_dir + "/fixtures/app1/long_process.js" );
+            app.directory.should.equal( test_dir + "/fixtures/app1" );
+            app.process_args.should.eql([test_dir + "/fixtures/app1/long_process.js", "arg1", "arg2"]);
         } );
+
+        it( 'should add the application specific config from forge.json', function() {
+            app.config.daemon.should.be.true;
+            app.config.sometestkey.should.equal( "sometestval" );
+        });
 
     });
 
@@ -146,11 +158,12 @@ describe( 'Application', function() {
 
             setTimeout( function() {
                 app.restart();
-                start.called.should.be.ok;
-                stop.called.should.be.ok;
+                start.called.should.be.true;
+                stop.called.should.be.true;
                 restart_count.should.equal( 1 );
-                start.reset();
-                stop.reset();
+                start.restore();
+                stop.restore();
+                app.stop();
                 done();
             }, 1000 );
         });
