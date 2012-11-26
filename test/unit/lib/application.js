@@ -9,6 +9,8 @@ var assert = require( "should" ),
     cfg = require( lib_dir + "/config.js"),
     factory = require( lib_dir + "/application.js" );
 
+
+
 describe( 'Application', function() {
 
     var app,
@@ -188,7 +190,7 @@ describe( 'Application', function() {
             cp.exec.called.should.be.true;
             exec_args = cp.exec.args[0];
 
-            exec_args[0].should.equal( "testgit reset --hard master && git pull origin master" );
+            exec_args[0].should.equal( "git reset --hard master && git pull origin master" );
             exec_args[1].should.eql( { cwd: app.directory } );
             git_cb = exec_args[2];
 

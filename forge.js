@@ -20,15 +20,3 @@ var libpath = __dirname + "/lib",
     runner = require( libpath + "/runner.js" );
 
     runner.go( app, process );
-    
-/*
-var fs = require( 'fs' ),
-    cp = require( 'child_process' ),
-    
-    processHook = function(hook) {
-
-    },
-    cfg_file = getCfgFile(process.env['GHCLIENT_CFG']),
-    config = JSON.parse( fs.readFileSync( cfg_file ) ),
-    
-*/
