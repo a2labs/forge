@@ -17,7 +17,7 @@ The primary use case right now is for development/staging environments where pro
 ## Basic Usage
 
 ```bash
-    $ forge [options] SCRIPT [script options]
+    $ forge [options] run [options] SCRIPT [script options]
 ```
 
 ## Configuration
