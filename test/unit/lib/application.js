@@ -190,7 +190,7 @@ describe( 'Application', function() {
             cp.exec.called.should.be.true;
             exec_args = cp.exec.args[0];
 
-            exec_args[0].should.equal( "git reset --hard master && git pull origin master" );
+            exec_args[0].should.equal( "git reset --hard master && git pull origin master && npm install" );
             exec_args[1].should.eql( { cwd: app.directory } );
             git_cb = exec_args[2];
 
