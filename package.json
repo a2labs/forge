@@ -1,7 +1,10 @@
 {
     "name": "forge"
   , "version": "0.0.1"
-  , "private": true
+  , "respository": {
+      "type": "git"
+      , "url": "git://github.com/appendToRD/forge.git"
+    }
   , "dependencies": {
     "amqp": "0.1.x"
     , "commander": "1.1.x"
@@ -20,6 +23,8 @@
     "test": "cd test && mocha"
   }
   , "engine": "node >= 0.8.1"
-  , "bin": { "forge" : "./forge.js" }
-  , "main": "./forge"
+  , "bin": { 
+    "forge" : "./bin/forge" 
+  }
+  , "main": "./lib/application.js"
 }
