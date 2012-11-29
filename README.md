@@ -7,13 +7,13 @@ A Node.js tool for continuous integration and development.
 At the time of this writing, forge will manage the running of a Node.js project while watching a RabbitMQ endpoint for changes to your project repository. When your RabbitMQ server receives a push notification from Github, forge will trigger an update of the local project repository and then restart your process.
 
 The primary use case right now is for development/staging environments where projects need to be kept running and in sync with the latest git revision.
-<!--
+
 ## Installation
 
 ```bash
-    $ [sudo] npm install forge -g
+    $ [sudo] npm install forge.js -g
 ```
--->
+
 ## Basic Usage
 
 ```bash
