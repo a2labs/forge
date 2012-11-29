@@ -50,14 +50,14 @@ describe( 'Runner', function() {
         done();
     });
 
-    describe( 'go', function() {
+    describe( 'run', function() {
 
         it( 'should stop the child process on the parent process exit', function() {
             var app_stub = sinon.stub( app );
             runner.rabbitConnect = sinon.stub( runner, 'rabbitConnect' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
-            runner.go( app_stub, parent_process );
+            runner.run( app_stub, parent_process );
 
             parent_process.on.called.should.be.true;
             parent_process.on.args[0][0].should.equal( 'exit' );
@@ -76,7 +76,7 @@ describe( 'Runner', function() {
             runner.rabbitConnect = sinon.stub( runner, 'rabbitConnect' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
-            runner.go( app_stub, parent_process );
+            runner.run( app_stub, parent_process );
 
             runner.rabbitConnect.called.should.be.true;
             runner.attachEvents.called.should.be.true;
@@ -91,9 +91,9 @@ describe( 'Runner', function() {
             runner.rabbitConnect = sinon.stub( runner, 'rabbitConnect' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
-            runner.go( app_stub, parent_process );
+            runner.run( app_stub, parent_process );
 
-            app_stub.start.called.should.be.true;
+            app_stub.run.called.should.be.true;
 
             runner.rabbitConnect.restore();
             runner.attachEvents.restore();
