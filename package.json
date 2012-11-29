@@ -9,7 +9,7 @@
     , "underscore.string": "2.3.0"
     , "postal": "0.7.x"
     , "step": "0.0.x"
-    , "forever": "0.10.x"
+    , "forever-monitor": "1.1.x"
   }
   , "devDependencies": {
     "mocha": "1.7.x"

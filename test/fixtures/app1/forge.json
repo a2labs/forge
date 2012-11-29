@@ -4,9 +4,9 @@
         "revision": ""
     },
     "update_on_start": false,
-    "daemon": true,
+    "daemon": false,
     "sometestkey": "sometestval",
     "scripts": {
-        "update": "./update.js"
+        "update": "npm install && ./update.js"
     }
 }

@@ -1,4 +1,4 @@
-var assert = require( "should" ),
+var should = require( "should" ),
     postal = require( "postal" ),
     sinon = require( "sinon" ),
     path = require( "path" ),
@@ -42,11 +42,14 @@ describe( 'Application', function() {
     });
 
     afterEach( function( done ) {
-        if ( app ) {
+        if ( app && app.child.process && app.child.process.running ) {
+            this.timeout(5000);
             app.stop();
+            setTimeout(done, 2000);
+        } else {
+            done();
         }
 
-        done();
     });
 
     describe( 'constructor', function() {
@@ -63,7 +66,7 @@ describe( 'Application', function() {
         } );
 
         it( 'should add the application specific config from forge.json', function() {
-            app.config.daemon.should.be.true;
+            app.config.daemon.should.be.false;
             app.config.sometestkey.should.equal( "sometestval" );
         });
 
@@ -149,25 +152,29 @@ describe( 'Application', function() {
 
     describe( 'restart', function() {
         it( 'should call stop() and start() in sequence', function( done ) {
-            app.start();
+            this.timeout(5000);
 
-            var start = sinon.stub( app, "start" ),
-                stop = sinon.stub( app, "stop" ),
+            var start_count = 0,
                 restart_count = 0;
+
+            postal.channel( "forge", "start").subscribe( function( msg) {
+                start_count++;
+            });
 
             postal.channel( "forge", "restart").subscribe( function( msg) {
                 restart_count++;
             });
 
+            app.start();
+
             setTimeout( function() {
                 app.restart();
-                start.called.should.be.true;
-                stop.called.should.be.true;
-                restart_count.should.equal( 1 );
-                start.restore();
-                stop.restore();
-                app.stop();
-                done();
+                setTimeout( function() {
+                    app.stop();
+                    restart_count.should.equal( 1 );
+                    start_count.should.equal( 2 );
+                    done();
+                }, 1000 );
             }, 1000 );
         });
     });
@@ -198,7 +205,7 @@ describe( 'Application', function() {
             // Can test for postal messages if we want to.
              
             exec_args2 = cp.exec.getCall(1).args;
-            exec_args2[0].should.equal( "./update.js" );
+            exec_args2[0].should.equal( "npm install && ./update.js" );
             exec_args2[1].should.eql( { cwd: app.directory } );
             update_cb = exec_args2[2];
 
@@ -211,6 +218,21 @@ describe( 'Application', function() {
             cp.exec.restore();
             app.restart.restore();
         } );
+
+    });
+
+    describe( 'reset', function() {
+
+        it( 'should set the child instance varible properties to null', function() {
+
+            app.child.process = 'someval1';
+            app.child.data = 'someval2';
+
+            app.reset();
+            
+            should.not.exist(app.child.process);
+            should.not.exist(app.child.data);
+        });
 
     });
 

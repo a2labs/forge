@@ -39,14 +39,17 @@ describe( 'args', function() {
                 parsed1.app.should.equal( 'somefile.js' );
                 parsed1.options.daemon.should.be.true;
                 parsed1.app_options.should.eql( ["somefile_arg1", "--somefile_flag", "-v"] );
+                parsed1.command.should.equal( 'run' );
 
                 parsed2.app.should.equal( 'somefile.js' );
                 parsed2.options.should.eql({});
                 parsed2.app_options.should.be.empty;
+                parsed2.command.should.equal( 'run' );
 
                 parsed3.app.should.equal( 'somefile.js' );
                 parsed3.options.should.eql({});
                 parsed3.app_options.should.eql(["--testflag"]);
+                parsed3.command.should.equal( 'run' );
 
         } );
 
