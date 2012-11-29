@@ -13,6 +13,7 @@
     , "postal": "0.7.x"
     , "step": "0.0.x"
     , "forever-monitor": "1.1.x"
+    , "ps-tree": "0.0.x"
   }
   , "devDependencies": {
     "mocha": "1.7.x"
@@ -24,7 +25,8 @@
   }
   , "engine": "node >= 0.8.1"
   , "bin": { 
-    "forge" : "./bin/forge" 
+    "forge" : "./bin/forge",
+    "forged": "./bin/forged"
   }
   , "main": "./lib/application.js"
 }

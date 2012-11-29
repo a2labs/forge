@@ -1,0 +1,6 @@
+{
+    "app_cfg_file": "forge.json",
+    "pid_dir": "/tmp",
+    "stdout_log": "./out.log",
+    "stderr_log": "./error.log"
+}

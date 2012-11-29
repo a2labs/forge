@@ -3,6 +3,7 @@ var assert = require( "should" ),
     sinon = require( "sinon" ),
     amqp = require( "amqp" ),
     path = require( "path" ),
+    cp = require( "child_process" ),
     root_dir = path.resolve( __dirname + "../../../../" ),
     lib_dir = root_dir + "/lib",
     test_dir = root_dir + "/test",
@@ -97,6 +98,30 @@ describe( 'Runner', function() {
 
             runner.rabbitConnect.restore();
             runner.attachEvents.restore();
+        });
+
+        it( 'should spawn a new process in daemon mode', function() {
+
+            cp.spawn = sinon.stub( cp, 'spawn' );
+
+            app.config.daemon = true;
+
+            var parent = {
+                argv: [ 'node','/Users/brian/nvm/v0.8.14/bin/forge','run','--daemon','server.js' ]
+            },
+            spawn_args;
+
+            runner.run(app, parent);
+
+            cp.spawn.called.should.be.true;
+            spawn_args = cp.spawn.args[0];
+
+            spawn_args[0].should.equal( 'node' );
+            spawn_args[1].should.eql( ['/Users/brian/nvm/v0.8.14/bin/forged','run', 'server.js'] );
+            spawn_args[2].should.eql( {
+                detached: true
+            } );
+
         });
 
     });
