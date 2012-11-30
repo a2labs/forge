@@ -49,6 +49,6 @@ Application level configuration options can be specified in a `forge.json` file 
     $ npm test
 ```
 
-## This is alpha software and not ready for public consumption. Use at your own risk.
+### This is alpha software. Use at your own risk.
 
 **Dual licensed under MIT and GPL**
