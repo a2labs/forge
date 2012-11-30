@@ -1,9 +1,10 @@
 var assert = require( "should" ),
     postal = require( "postal" ),
-    sinon = require( "sinon" ),
     amqp = require( "amqp" ),
     path = require( "path" ),
+    fs = require( "fs" ),
     cp = require( "child_process" ),
+    sinon = require( "sinon" ),
     root_dir = path.resolve( __dirname + "../../../../" ),
     lib_dir = root_dir + "/lib",
     test_dir = root_dir + "/test",
@@ -53,12 +54,35 @@ describe( 'Runner', function() {
 
     describe( 'run', function() {
 
+        it( 'should delegate to the correct start method based on the daemon parameter', function() {
+            runner.startDaemon = sinon.stub( runner, 'startDaemon' );
+            runner.startMonitor = sinon.stub( runner, 'startMonitor' );
+
+            runner.run( null, null, true );
+            runner.startDaemon.called.should.be.true;
+            runner.startMonitor.called.should.be.false;
+
+            runner.startDaemon.reset();
+            runner.startMonitor.reset();            
+
+            runner.run( null, null, false );
+            runner.startDaemon.called.should.be.false;
+            runner.startMonitor.called.should.be.true;            
+
+            runner.startDaemon.restore();
+            runner.startMonitor.restore();
+        });
+
+    });
+
+    describe( 'startMonitor', function() {
+
         it( 'should stop the child process on the parent process exit', function() {
             var app_stub = sinon.stub( app );
             runner.rabbitConnect = sinon.stub( runner, 'rabbitConnect' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
-            runner.run( app_stub, parent_process );
+            runner.startMonitor( app_stub, parent_process );
 
             parent_process.on.called.should.be.true;
             parent_process.on.args[0][0].should.equal( 'exit' );
@@ -74,10 +98,12 @@ describe( 'Runner', function() {
 
         it( 'should set up the RabbitMQ connection and attach the control event listeners', function() {
             var app_stub = sinon.stub( app );
+            app_stub.config.rabbitmq = true;
+
             runner.rabbitConnect = sinon.stub( runner, 'rabbitConnect' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
-            runner.run( app_stub, parent_process );
+            runner.startMonitor( app_stub, parent_process );
 
             runner.rabbitConnect.called.should.be.true;
             runner.attachEvents.called.should.be.true;
@@ -92,26 +118,34 @@ describe( 'Runner', function() {
             runner.rabbitConnect = sinon.stub( runner, 'rabbitConnect' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
-            runner.run( app_stub, parent_process );
+            runner.startMonitor( app_stub, parent_process );
 
-            app_stub.run.called.should.be.true;
+            app_stub.start.called.should.be.true;
 
             runner.rabbitConnect.restore();
             runner.attachEvents.restore();
         });
+    });
+
+    describe( 'startDaemon', function() {
 
         it( 'should spawn a new process in daemon mode', function() {
 
-            cp.spawn = sinon.stub( cp, 'spawn' );
+            var child = {};
+            child.pid = 1111;
+            child.unref = sinon.stub();
 
-            app.config.daemon = true;
+            cp.spawn = sinon.stub( cp, 'spawn' ).returns( child );
+            fs.openSync = sinon.stub( fs, 'openSync' ).returns( 'ignore' );
+
+            runner.savePid = sinon.stub( runner, 'savePid' );
 
             var parent = {
                 argv: [ 'node','/Users/brian/nvm/v0.8.14/bin/forge','run','--daemon','server.js' ]
             },
             spawn_args;
 
-            runner.run(app, parent);
+            runner.startDaemon(app, parent);
 
             cp.spawn.called.should.be.true;
             spawn_args = cp.spawn.args[0];
@@ -119,11 +153,95 @@ describe( 'Runner', function() {
             spawn_args[0].should.equal( 'node' );
             spawn_args[1].should.eql( ['/Users/brian/nvm/v0.8.14/bin/forged','run', 'server.js'] );
             spawn_args[2].should.eql( {
-                detached: true
+                detached: true,
+                stdio: [ 'ignore', 'ignore', 'ignore' ]
             } );
 
+            child.unref.called.should.be.true;
+            runner.savePid.args[0][0].should.equal( 1111 );
+            runner.savePid.args[0][1].should.eql( app );
+
+            cp.spawn.restore();
+            runner.savePid.restore();
+            fs.openSync.restore();
         });
 
+    });
+
+    describe( 'getPidFile', function() {
+        it( 'should returned the path to the pid file for the current process', function() {
+            app.config.pid_dir = "/var/tmp";
+            app.executable = "sometestfile.js";
+
+            var path = runner.getPidFile( app );
+            path.should.equal("/var/tmp/5a45decb9032868fabceb1adb08630ed.pid");
+        });
+    });
+
+    describe( 'savePid', function() {
+        it( 'should save a single pid to a file', function() {
+            fs.writeFile = sinon.stub( fs, 'writeFile' );
+
+            app.config.pid_dir = "/var/tmp";
+            app.executable = "sometestfile.js";
+
+            runner.savePid( '1111', app );
+            var args = fs.writeFile.args[0];
+
+            args[0].should.equal( "/var/tmp/5a45decb9032868fabceb1adb08630ed.pid" );
+            args[1].should.equal( '1111' );
+
+            fs.writeFile.restore();
+
+        });
+    });
+
+    describe( 'stop', function() {
+        it( 'should retrieve the pid from a file and then kill the monitor and child processes', function() {
+            var parent_process = {},
+                psTree_cmd = sinon.stub(),
+                kill_cb;
+
+            parent_process.kill = sinon.stub();
+
+
+            cp.spawn = sinon.stub( cp, 'spawn' );
+            fs.existsSync = sinon.stub( fs, 'writeFileSync' ).returns( true );
+            fs.readFileSync = sinon.stub( fs, 'readFileSync' ).returns( '1111' );
+
+            app.config.pid_dir = "/var/tmp";
+            app.executable = "sometestfile.js";
+
+            runner.stop( app, parent_process, psTree_cmd );
+
+            fs.existsSync.args[0][0].should.equal( "/var/tmp/5a45decb9032868fabceb1adb08630ed.pid" );
+
+            psTree_cmd.args[0][0].should.equal( 1111 );
+            kill_cb = psTree_cmd.args[0][1];
+
+            kill_cb( '', [
+                { PID: '1112' },
+                { PID: '1113' }
+            ]);
+
+            parent_process.kill.args[0][0].should.equal( 1111 );
+            cp.spawn.args[0][0].should.equal( 'kill' );
+            cp.spawn.args[0][1].should.eql( [ '-9', '1112', '1113' ] );
+
+            fs.existsSync.restore();
+            fs.readFileSync.restore();
+            cp.spawn.restore();
+        });
+    });
+
+    describe( 'update', function() {
+        it( 'should call the application\'s update method', function() {
+            var test_app = {};
+            test_app.update = sinon.spy();
+
+            runner.update( test_app );
+            test_app.update.called.should.be.true;
+        });
     });
 
     describe( 'attachEvents', function() {
@@ -217,6 +335,10 @@ describe( 'Runner', function() {
 
             queue.subscribe.called.should.be.true;
             sub_cb = queue.subscribe.args[0][0];
+
+            postal.publish.reset();
+            postal.channel.reset();
+
             sub_cb( msg );
 
             channel_args = postal.channel.args[0];

@@ -62,7 +62,7 @@ describe( 'Application', function() {
 
             app.executable.should.equal( test_dir + "/fixtures/app1/long_process.js" );
             app.directory.should.equal( test_dir + "/fixtures/app1" );
-            app.process_args.should.eql([test_dir + "/fixtures/app1/long_process.js", "arg1", "arg2"]);
+
         } );
 
         it( 'should add the application specific config from forge.json', function() {
@@ -148,6 +148,30 @@ describe( 'Application', function() {
                 }, 1000);
             }, 1000);
         });
+
+        it( 'should execute a callback and force a restart if specified', function( done ) {
+            this.timeout(5000);
+
+            app.start();
+
+            app.start = sinon.stub( app, 'start' );
+            app.reset = sinon.stub( app, 'reset' );
+            var cb = sinon.spy();
+
+            setTimeout(function() {
+                app.stop( true, cb );
+
+                setTimeout(function() {
+                    cb.called.should.be.true;
+                    app.start.called.should.be.true;
+                    app.reset.called.should.be.true;
+                    app.start.restore();
+                    app.reset.restore();
+                    done();
+                }, 1000);
+
+            }, 1000 );
+        });
     });
 
     describe( 'restart', function() {
@@ -185,14 +209,15 @@ describe( 'Application', function() {
             var exec_args,
                 exec_args2,
                 git_cb,
-                update_cb;
+                update_cb,
+                update_done;
 
             postal.channel = sinon.stub( postal, 'channel' ).returns( postal );
             postal.publish = sinon.stub( postal, 'publish' );
             cp.exec = sinon.stub( cp, 'exec' );
-            app.restart = sinon.stub( app, 'restart' );
+            update_done = sinon.stub();
 
-            app.update();
+            app.update( update_done );
 
             cp.exec.called.should.be.true;
             exec_args = cp.exec.args[0];
@@ -211,12 +236,11 @@ describe( 'Application', function() {
 
             update_cb();
 
-            app.restart.called.should.be.true;
+            update_done.called.should.be.true;
 
             postal.channel.restore();
             postal.publish.restore();
             cp.exec.restore();
-            app.restart.restore();
         } );
 
     });
