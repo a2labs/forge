@@ -70,6 +70,15 @@ describe( 'Application', function() {
             app.config.sometestkey.should.equal( "sometestval" );
         });
 
+        it.only( 'should derive the executable from the config file if it is not specified', function() {
+
+            var args = {},
+                options = { cwd: test_dir + "/fixtures/app2" },
+                new_app = factory.create( args, config, options );
+
+            new_app.executable.should.equal( test_dir + "/fixtures/app2/app.js" );
+        });
+
     });
 
     describe( 'start', function() {
