@@ -91,19 +91,19 @@ describe( 'Application', function() {
                 out_count = 0,
                 err_count = 0;
 
-            postal.channel("forge", "start").subscribe( function(msg) {
+            postal.channel("forge", "log.start").subscribe( function(msg) {
                 start_count++;
             });
 
-            postal.channel("forge", "exit").subscribe( function(msg) {
+            postal.channel("forge", "log.exit").subscribe( function(msg) {
                 exit_count++;
             });
 
-            postal.channel("application", "output").subscribe( function(msg) {
+            postal.channel("application", "log.output").subscribe( function(msg) {
                 out_count++;
             });
 
-            postal.channel("application", "error").subscribe( function(msg) {
+            postal.channel("application", "log.error").subscribe( function(msg) {
                 err_count++;
             });
 
@@ -135,11 +135,11 @@ describe( 'Application', function() {
             var forge_exit = 0,
                 app_exit = 0;
 
-            postal.channel( "forge", "exit").subscribe( function( msg) {
+            postal.channel( "forge", "log.exit").subscribe( function( msg) {
                 forge_exit++;
             });
 
-            postal.channel( "application", "exit").subscribe( function( msg ) {
+            postal.channel( "application", "log.exit").subscribe( function( msg ) {
                 app_exit++;
             });
 
@@ -190,11 +190,11 @@ describe( 'Application', function() {
             var start_count = 0,
                 restart_count = 0;
 
-            postal.channel( "forge", "start").subscribe( function( msg) {
+            postal.channel( "forge", "log.start").subscribe( function( msg) {
                 start_count++;
             });
 
-            postal.channel( "forge", "restart").subscribe( function( msg) {
+            postal.channel( "forge", "log.restart").subscribe( function( msg) {
                 restart_count++;
             });
 
