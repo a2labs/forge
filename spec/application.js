@@ -3,11 +3,12 @@ var should = require( "should" ),
     sinon = require( "sinon" ),
     path = require( "path" ),
     cp = require( "child_process" ),
-    root_dir = path.resolve( __dirname + "../../../../" ),
+    root_dir = path.resolve( __dirname + "../../" ),
     lib_dir = root_dir + "/lib",
-    test_dir = root_dir + "/test",
+    test_dir = root_dir + "/spec",
     cfg = require( lib_dir + "/config.js"),
-    factory = require( lib_dir + "/application.js" );
+    factory = require( lib_dir + "/application.js" ),
+    update = require( lib_dir + "/update.js" );
 
 
 
@@ -214,42 +215,18 @@ describe( 'Application', function() {
 
     describe( 'update', function() {
 
-        it( 'should pull the latest content from a git repository, run an update script, and restart the app', function() {
-            var exec_args,
-                exec_args2,
-                git_cb,
-                update_cb,
-                update_done;
+        it( 'should try a safe update and forward itself and a callback', function() {
+            var cb = sinon.spy();
+            update.safe = sinon.stub( update, 'safe' );
 
-            postal.channel = sinon.stub( postal, 'channel' ).returns( postal );
-            postal.publish = sinon.stub( postal, 'publish' );
-            cp.exec = sinon.stub( cp, 'exec' );
-            update_done = sinon.stub();
+            app.update( cb );
 
-            app.update( update_done );
+            update.safe.called.should.be.true;
+            update.safe.args[0][0].should.eql( app );
+            update.safe.args[0][1].should.eql( cb );
 
-            cp.exec.called.should.be.true;
-            exec_args = cp.exec.args[0];
+            update.safe.restore();
 
-            exec_args[0].should.equal( "git reset --hard master && git pull origin master && npm install" );
-            exec_args[1].should.eql( { cwd: app.directory } );
-            git_cb = exec_args[2];
-
-            git_cb( '', 'someoutput' );
-            // Can test for postal messages if we want to.
-             
-            exec_args2 = cp.exec.getCall(1).args;
-            exec_args2[0].should.equal( "npm install && ./update.js" );
-            exec_args2[1].should.eql( { cwd: app.directory } );
-            update_cb = exec_args2[2];
-
-            update_cb();
-
-            update_done.called.should.be.true;
-
-            postal.channel.restore();
-            postal.publish.restore();
-            cp.exec.restore();
         } );
 
     });

@@ -1,8 +1,8 @@
 var should = require( "should" ),
     path = require( "path" ),
-    root_dir = path.resolve( __dirname + "../../../../" ),
+    root_dir = path.resolve( __dirname + "../../" ),
     lib_dir = root_dir + "/lib",
-    test_dir = root_dir + "/test";
+    test_dir = root_dir + "/spec";
 
 describe( 'args', function() {
 
