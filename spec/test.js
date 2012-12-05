@@ -1,4 +1,4 @@
-require( "../lib/logger.js" )( { silent: true } );
+require( "../lib/logger.js" ).silence();
 require( "./args.js" );
 require( "./config.js" );
 require( "./application.js" );
