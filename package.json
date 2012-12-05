@@ -1,33 +1,34 @@
 {
-    "name": "forge.js"
-  , "version": "0.1.0"
-  , "respository": {
-      "type": "git"
-      , "url": "git://github.com/a2labs/forge.git"
-    }
-  , "dependencies": {
-    "amqp": "0.1.x"
-    , "commander": "1.1.x"
-    , "underscore": "1.4.x"
-    , "underscore.string": "2.3.0"
-    , "postal": "0.7.x"
-    , "step": "0.0.x"
-    , "forever-monitor": "1.1.x"
-    , "ps-tree": "0.0.x"
-    , "machina": "0.3.x"
-  }
-  , "devDependencies": {
-    "mocha": "1.7.x"
-    , "sinon": "1.5.x"
-    , "should": "1.2.x"
-  }
-  , "scripts": {
-    "test": "cd spec && mocha"
-  }
-  , "engine": "node >= 0.8.1"
-  , "bin": { 
-    "forge" : "./bin/forge",
-    "forged": "./bin/forged"
-  }
-  , "main": "./lib/application.js"
+    "name": "forge.js",
+    "version": "0.1.0",
+    "respository": {
+      "type": "git",
+      "url": "git://github.com/a2labs/forge.git"
+    },
+    "dependencies": {
+      "amqp": "0.1.x",
+      "commander": "1.1.x",
+      "underscore": "1.4.x",
+      "underscore.string": "2.3.0",
+      "postal": "0.7.x",
+      "step": "0.0.x",
+      "forever-monitor": "1.1.x",
+      "ps-tree": "0.0.x",
+      "machina": "0.3.x",
+      "winston": "0.6.x"
+    },
+    "devDependencies": {
+      "mocha": "1.7.x",
+      "sinon": "1.5.x",
+      "should": "1.2.x"
+    },
+    "scripts": {
+      "test": "cd spec && mocha"
+    },
+    "engine": "node >= 0.8.1",
+    "bin": {
+      "forge" : "./bin/forge",
+      "forged": "./bin/forged"
+    },
+    "main": "./lib/application.js"
 }
