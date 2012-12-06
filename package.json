@@ -15,7 +15,8 @@
       "forever-monitor": "1.1.x",
       "ps-tree": "0.0.x",
       "machina": "0.3.x",
-      "winston": "0.6.x"
+      "winston": "0.6.x",
+      "fs-watch-tree": "0.2.x"
     },
     "devDependencies": {
       "mocha": "1.7.x",
