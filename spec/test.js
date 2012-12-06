@@ -5,3 +5,4 @@ require( "./application.js" );
 require( "./runner.js" );
 require( "./update.js" );
 require( "./watcher.js" );
+require( "./connector.js" );
