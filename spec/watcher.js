@@ -10,6 +10,8 @@ var assert = require( "should" ),
     wt = require( "fs-watch-tree" ),
     watcher = require( lib_dir + "/watcher.js" );
 
+require( lib_dir + "/mixins.js" );
+
 describe( "Watcher", function() {
 
     var app = {
@@ -27,9 +29,24 @@ describe( "Watcher", function() {
             
             watcher.init( app );
 
-            watcher.options.should.eql({ exclude: [".git", ".svn", ".idea", "node_modules$", "folder1", "folder2"]});
+            watcher.options.should.eql({ exclude: ["folder1", "folder2"]});
             watcher.directory.should.equal( "/some/directory/path" );
 
+        });
+
+        it( 'should set use the path config to set the watch directory if present', function() {
+            var mock_app = {
+                directory: "/some/directory/path",
+                config: {
+                    watch: {
+                        path: "/watchfolder"
+                    }
+                }
+            };
+
+            watcher.init( mock_app );
+
+            watcher.directory.should.equal( "/some/directory/path/watchfolder" );
         });
 
         it( 'should turn itself off during updates', function() {
@@ -76,7 +93,7 @@ describe( "Watcher", function() {
 
                 var args = wt.watchTree.args[0];
                 args[0].should.equal( "/some/directory/path" );
-                args[1].should.eql( { exclude: [".git", ".svn", ".idea", "node_modules$", "folder1", "folder2"] } );
+                args[1].should.eql( { exclude: ["folder1", "folder2"] } );
 
                 var cb = args[2];
 

@@ -7,6 +7,8 @@ var should = require( "should" ),
     lib_dir = root_dir + "/lib",
     update = require( lib_dir + "/update.js" );
 
+require( lib_dir + "/mixins.js" );
+
 describe( "Update", function() {
 
     var options = { cwd: root_dir };

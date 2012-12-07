@@ -1,5 +1,10 @@
 {
     "include": ["somefile.js", "somefile2.js"],
-    "daemon": false,
+    "daemon": {
+        "on": true,
+        "pid_dir": "/tmp",
+        "stdout_log": "./out.log",
+        "stderr_log": "./err.log"
+    },
     "update_script": "somefile.js"
 }

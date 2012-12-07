@@ -3,6 +3,8 @@ var should = require( "should" ),
     root_dir = path.resolve( __dirname + "../../" ),
     lib_dir = root_dir + "/lib";
 
+require( lib_dir + "/mixins.js" );
+
 describe( 'config', function() {
 
     var config;
@@ -17,7 +19,7 @@ describe( 'config', function() {
         it( 'should read variables from a configuration file', function() {
             var parsed = config.init( root_dir + "/spec/fixtures/config.json" );
             parsed.include.should.eql( ['somefile.js', 'somefile2.js']);
-            parsed.daemon.should.equal( false );
+            parsed.daemon.on.should.be.true;
         } );
 
         it( 'should return the default configuration object if no file is found', function() {

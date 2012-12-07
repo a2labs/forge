@@ -4,6 +4,8 @@ var should = require( "should" ),
     lib_dir = root_dir + "/lib",
     test_dir = root_dir + "/spec";
 
+require( lib_dir + "/mixins.js" );
+
 describe( 'args', function() {
 
     var args;
@@ -37,17 +39,23 @@ describe( 'args', function() {
                 delete require.cache[args_path];
 
                 parsed1.app.should.equal( 'somefile.js' );
-                parsed1.options.daemon.should.be.true;
+                parsed1.options.daemon.on.should.be.true;
                 parsed1.app_options.should.eql( ["somefile_arg1", "--somefile_flag", "-v"] );
                 parsed1.command.should.equal( 'run' );
 
                 parsed2.app.should.equal( 'somefile.js' );
-                parsed2.options.should.eql({ "watch": {} });
+                parsed2.options.should.eql({
+                    "daemon": {},
+                    "watch": {}
+                });
                 parsed2.app_options.should.be.empty;
                 parsed2.command.should.equal( 'run' );
 
                 parsed3.app.should.equal( 'somefile.js' );
-                parsed3.options.should.eql({ "watch": {} });
+                parsed3.options.should.eql({
+                    "daemon": {},
+                    "watch": {}
+                });
                 parsed3.app_options.should.eql(["--testflag"]);
                 parsed3.command.should.equal( 'run' );
 

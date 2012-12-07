@@ -1,0 +1,84 @@
+{
+    // The file to execute if none is specified
+    "executable": "app.js",
+
+    // Run update process prior to starting program
+    "update_on_start": false,
+
+    // The maximum number of times the script should attempt to be restarted in case of crashes
+    "max_restarts": null,
+
+    // Information for update listener connections
+    "connections": {
+        // Turn update connection on by default
+        "on": true,
+
+        // Determines which connector to use if "rabbitmq" and "http" configurations are both present
+        "use": "rabbitmq",
+
+        // RabbitMQ connection info
+        // To use, set up an amqp post commit hook in Github
+        "rabbitmq": {
+            "connection": {
+                "host": "rabbit.somedomain.net",
+                "login": "rabbituser",
+                "password": "rabbitpass",
+                "vhost": "rabbitvhost"
+            },
+            "queue": "rabbitmq.queue",
+            "exchange": "rabbitmq.exchange",
+            "key": "github.push.owner.repo.revision"
+        },
+
+        // Information to set up HTTP server to listen for update
+        // To use, point a post commit hook at http://yourhost.com:{{ http.port }}
+        "http": {
+            "port": 9999,
+            "key": "owner.repo.revision"
+        }
+    },
+
+    "scripts": {
+        // This command will be run after an update is performed
+        "update": "npm install && ./update.js && echo \"This was a shell command\""
+    },
+
+    // Parameters for watch mode
+    "watch": {
+
+        // Turn watch mode on by default
+        "on": false,
+
+        // Path relative to the project directory that should be watched for changes
+        // Defaults to project root
+        "path": "",
+
+        // A list of files and directories to exclude from watching
+        // All values will be relative to watch.path
+        "exclude": [],
+    },
+
+    // Parameters for daemon mode
+    "daemon": {
+
+        // Start daemon mode by default
+        "on": false,
+
+        // Directory in which to store pid files
+        // @TODO: Implement "forge" folder inside this directory for pid storage
+        "pid_dir": "/tmp",
+
+        // Log file for stdout
+        "stdout_log": "./out.log",
+
+        // Log file for stderr
+        "stderr_log": "./out.log"    
+    },
+
+    // Git repo information
+    "git": {
+        "remote": "origin",
+        "revision": "master"
+    }
+    
+}

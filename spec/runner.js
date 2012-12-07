@@ -15,6 +15,8 @@ var assert = require( "should" ),
     watcher = require( lib_dir + "/watcher.js" ),
     runner = require( lib_dir + "/runner.js" );
 
+require( lib_dir + "/mixins.js" );
+
 describe( 'Runner', function() {
 
     var parent_process = {},
@@ -43,6 +45,11 @@ describe( 'Runner', function() {
 
     beforeEach( function( done ) {
         app = createApp( 'long' );
+        app.config.daemon = {
+            pid_dir: "/var/tmp",
+            stdout_log: "./out.log",
+            stderr_log: "./out.log"
+        };
         parent_process.on = sinon.stub();
         done();
     });
@@ -60,9 +67,13 @@ describe( 'Runner', function() {
         it( 'should delegate to the correct start method based on the daemon parameter', function() {
             runner.startDaemon = sinon.stub( runner, 'startDaemon' );
             runner.startMonitor = sinon.stub( runner, 'startMonitor' );
+            connector.init = sinon.stub( connector, 'init' );
 
             var mock_app = {
                 config: {
+                    connections: {
+                        on: true
+                    },
                     watch: {}
                 }
             };
@@ -70,14 +81,20 @@ describe( 'Runner', function() {
             runner.run( mock_app, null, true );
             runner.startDaemon.called.should.be.true;
             runner.startMonitor.called.should.be.false;
+            connector.init.called.should.be.false;
 
+            connector.init.reset();
             runner.startDaemon.reset();
             runner.startMonitor.reset();            
 
             runner.run( mock_app, null, false );
             runner.startDaemon.called.should.be.false;
-            runner.startMonitor.called.should.be.true;            
+            runner.startMonitor.called.should.be.true;
 
+            connector.init.called.should.be.true;
+            connector.init.args[0][0].should.eql( mock_app );
+
+            connector.init.restore();
             runner.startDaemon.restore();
             runner.startMonitor.restore();
         });
@@ -89,6 +106,9 @@ describe( 'Runner', function() {
 
             var mock_app = {
                 config: {
+                    connections: {
+                        on: false
+                    },
                     watch: {
                         on: true
                     }
@@ -111,13 +131,9 @@ describe( 'Runner', function() {
 
         it( 'should stop the child process on the parent process exit', function() {
             var app_stub = sinon.stub( app );
-            connector.init = sinon.stub( connector, 'init' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
             runner.startMonitor( app_stub, parent_process );
-
-            connector.init.called.should.be.true;
-            connector.init.args[0][0].should.eql( app_stub );
 
             parent_process.on.called.should.be.true;
             parent_process.on.args[0][0].should.equal( 'exit' );
@@ -126,21 +142,40 @@ describe( 'Runner', function() {
             cb();
             app_stub.stop.called.should.be.true;
 
-            connector.init.restore();
+            
             runner.attachEvents.restore();
 
         });
 
         it( 'should start the child process', function() {
             var app_stub = sinon.stub( app );
-            connector.init = sinon.stub( connector, 'init' );
             runner.attachEvents = sinon.stub( runner, 'attachEvents' );
 
             runner.startMonitor( app_stub, parent_process );
 
             app_stub.start.called.should.be.true;
 
-            connector.init.restore();
+            runner.attachEvents.restore();
+        });
+
+        it( 'should attempt an update before starting if specified in config', function() {
+            app.update = sinon.stub( app, "update" ).callsArg( 0 );
+            app.start = sinon.stub( app, "start" );
+
+            var update_on_start = app.config.update_on_start;
+            app.config.update_on_start = true;
+
+            runner.attachEvents = sinon.stub( runner, 'attachEvents' );
+
+            runner.startMonitor( app, parent_process );
+
+            app.update.called.should.be.true;
+            app.start.called.should.be.true;
+
+            app.start.restore();
+            app.update.restore();
+            app.config.update_on_start = update_on_start;
+
             runner.attachEvents.restore();
         });
     });
@@ -188,7 +223,7 @@ describe( 'Runner', function() {
 
     describe( 'getPidFile', function() {
         it( 'should returned the path to the pid file for the current process', function() {
-            app.config.pid_dir = "/var/tmp";
+
             app.executable = "sometestfile.js";
 
             var path = runner.getPidFile( app );
@@ -200,7 +235,7 @@ describe( 'Runner', function() {
         it( 'should save a single pid to a file', function() {
             fs.writeFile = sinon.stub( fs, 'writeFile' );
 
-            app.config.pid_dir = "/var/tmp";
+            app.config.daemon.pid_dir = "/var/tmp";
             app.executable = "sometestfile.js";
 
             runner.savePid( '1111', app );
@@ -227,7 +262,7 @@ describe( 'Runner', function() {
             fs.existsSync = sinon.stub( fs, 'writeFileSync' ).returns( true );
             fs.readFileSync = sinon.stub( fs, 'readFileSync' ).returns( '1111' );
 
-            app.config.pid_dir = "/var/tmp";
+            app.config.daemon.pid_dir = "/var/tmp";
             app.executable = "sometestfile.js";
 
             runner.stop( app, parent_process, psTree_cmd );

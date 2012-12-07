@@ -11,6 +11,8 @@ var assert = require( "should" ),
     logger = require( lib_dir + "/logger.js" ).silence(),
     connector = require( lib_dir + "/connector.js" );
 
+require( lib_dir + "/mixins.js" );
+
 describe( "Connector", function() {
 
     describe( 'init', function() {
@@ -18,8 +20,11 @@ describe( "Connector", function() {
         it( 'should call the correct connector method', function() {
             var app = {
                 config: {
-                    rabbitmq: {
-                        host: 'somehost'
+                    connections: {
+                        on: true,
+                        rabbitmq: {
+                            host: 'somehost'
+                        }
                     }
                 }
             };
@@ -37,8 +42,57 @@ describe( "Connector", function() {
 
             app = {
                 config: {
-                    http: {
-                        port: '9999'
+                    connections: {
+                        on: true,
+                        http: {
+                            port: '9999'
+                        }
+                    }
+                }
+            };
+
+            connector.init( app );
+
+            connector.rabbit.called.should.be.false;
+            connector.http.called.should.be.true;
+
+            connector.rabbit.reset();
+            connector.http.reset();
+
+            app = {
+                config: {
+                    connections: {
+                        on: true,
+                        use: "rabbitmq",
+                        rabbitmq: {
+                            host: 'somehost'
+                        },
+                        http: {
+                            port: '9999'
+                        }
+                    }
+                }
+            };
+
+            connector.init( app );
+
+            connector.rabbit.called.should.be.true;
+            connector.http.called.should.be.false;
+
+            connector.rabbit.reset();
+            connector.http.reset();
+
+            app = {
+                config: {
+                    connections: {
+                        on: true,
+                        use: "http",
+                        rabbitmq: {
+                            host: 'somehost'
+                        },
+                        http: {
+                            port: '9999'
+                        }
                     }
                 }
             };

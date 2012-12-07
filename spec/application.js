@@ -11,7 +11,7 @@ var should = require( "should" ),
     factory = require( lib_dir + "/application.js" ),
     update = require( lib_dir + "/update.js" );
 
-
+require( lib_dir + "/mixins.js" );
 
 describe( 'Application', function() {
 
@@ -68,7 +68,7 @@ describe( 'Application', function() {
         } );
 
         it( 'should add the application specific config from forge.json', function() {
-            app.config.daemon.should.be.false;
+            app.config.daemon.on.should.be.false;
             app.config.sometestkey.should.equal( "sometestval" );
         });
 

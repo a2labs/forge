@@ -1,6 +1,6 @@
 {
     "name": "forge.js",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "respository": {
       "type": "git",
       "url": "git://github.com/a2labs/forge.git"
@@ -16,7 +16,8 @@
       "ps-tree": "0.0.x",
       "machina": "0.3.x",
       "winston": "0.6.x",
-      "fs-watch-tree": "0.2.x"
+      "fs-watch-tree": "0.2.x",
+      "underscoreDeepExtend": "git://github.com/pygy/undescoreDeepExtend.git"
     },
     "devDependencies": {
       "mocha": "1.7.x",

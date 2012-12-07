@@ -1,6 +1,43 @@
 {
     "app_cfg_file": "forge.json",
-    "pid_dir": "/tmp",
-    "stdout_log": "./out.log",
-    "stderr_log": "./error.log"
+    "executable": null,
+    "update_on_start": false,
+    "max_restarts": null,
+    "connections": {
+        "on": true,
+        "use": "rabbitmq",
+        "rabbitmq": {
+            "connection": {
+                "host": null,
+                "login": null,
+                "password": null,
+                "vhost": null
+            },
+            "queue": null,
+            "exchange": null,
+            "key": null
+        },
+        "http": {
+            "port": null,
+            "key": null
+        }
+    },
+    "scripts": {
+        "update": null
+    },
+    "watch": {
+        "on": false,
+        "path": null,
+        "exclude": []
+    },
+    "daemon": {
+        "on": false,
+        "pid_dir": "/tmp",
+        "stdout_log": "./out.log",
+        "stderr_log": "./out.log"    
+    },
+    "git": {
+        "remote": "origin",
+        "revision": "master"
+    }
 }
