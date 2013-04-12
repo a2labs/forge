@@ -17,7 +17,7 @@
       "machina": "0.3.x",
       "winston": "0.6.x",
       "fs-watch-tree": "0.2.x",
-      "underscoreDeepExtend": "git://github.com/pygy/undescoreDeepExtend.git"
+      "underscoreDeepExtend": "git://github.com/pygy/underscoreDeepExtend.git"
     },
     "devDependencies": {
       "mocha": "1.7.x",
